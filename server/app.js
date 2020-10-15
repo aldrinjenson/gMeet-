@@ -23,4 +23,15 @@ app.post("/user/get-room-id", (req, res) => {
   res.json({ user, roomId });
 });
 
+io.on("connection", (socket) => {
+  socket.on("join-room", (roomId, userId) => {
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit("user-connected", userId);
+
+    socket.on("disconnect", () => {
+      socket.to(roomId).broadcast.emit("user-disconnected", userId);
+    });
+  });
+});
+
 server.listen(5000);
